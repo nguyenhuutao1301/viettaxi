@@ -9,6 +9,28 @@ const vehicleTypes = [
   { id: '7-seat', label: 'Taxi 7 Chỗ', icon: 'TruckIcon', desc: '1–7 hành khách' },
 ];
 
+const API_BASE_URL =
+  'https://api.taxinhanh247.pro.vn' ||
+  'https://www.api.taxinhanh247.pro.vn' ||
+  'http://localhost:3002';
+
+const getVisitorId = () => {
+  if (typeof window === 'undefined') return undefined;
+
+  const STORAGE_KEY = 'viettaxi_visitor_id';
+  let visitorId = localStorage.getItem(STORAGE_KEY);
+
+  if (!visitorId) {
+    visitorId =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `guest-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    localStorage.setItem(STORAGE_KEY, visitorId);
+  }
+
+  return visitorId;
+};
+
 export default function HeroSection() {
   const [selectedVehicle, setSelectedVehicle] = useState('4-seat');
   const [formData, setFormData] = useState({
@@ -19,13 +41,48 @@ export default function HeroSection() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setIsSubmitting(false);
-    setSubmitted(true);
+    setSubmitError('');
+
+    try {
+      const payload = {
+        addressFrom: formData.pickup.trim(),
+        addressTo: formData.destination.trim(),
+        phoneNumber: formData.phone.trim(),
+        additionalInfo: formData.notes.trim(),
+        serviceType: selectedVehicle === '4-seat' ? 'Grap 4 Chỗ' : 'Grap 7 Chỗ',
+        visitorId: getVisitorId(),
+      };
+
+      const response = await fetch(`${API_BASE_URL}/api/booking/discord/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: siteConfig.url || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          result?.err || result?.message || 'Gửi đơn hàng thất bại. Vui lòng thử lại.'
+        );
+      }
+
+      setSubmitted(true);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Gửi đơn hàng thất bại. Vui lòng thử lại.';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -204,6 +261,12 @@ export default function HeroSection() {
                         className="w-full px-4 py-3 rounded-xl border border-border bg-muted text-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                       />
 
+                      {submitError ? (
+                        <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                          {submitError}
+                        </p>
+                      ) : null}
+
                       <button
                         type="submit"
                         disabled={isSubmitting}
@@ -300,6 +363,7 @@ export default function HeroSection() {
                       <button
                         onClick={() => {
                           setSubmitted(false);
+                          setSubmitError('');
                           setFormData({ pickup: '', destination: '', phone: '', notes: '' });
                         }}
                         className="py-2.5 rounded-xl border border-border text-foreground text-sm font-700 hover:bg-muted transition-colors"
