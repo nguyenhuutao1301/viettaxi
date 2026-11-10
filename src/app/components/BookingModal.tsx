@@ -9,8 +9,8 @@ interface BookingModalProps {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  'https://api.taxinhanh247.pro.vn' ||
+  'https://www.api.taxinhanh247.pro.vn' ||
   'http://localhost:3002';
 
 const getVisitorId = () => {
