@@ -82,7 +82,7 @@ export default function Header() {
             {/* Desktop Right */}
             <div className="hidden lg:flex items-center gap-3">
               <a
-                href="tel:+84901234567"
+                href={`tel:${siteConfig.contact.phone}`}
                 className={`flex items-center gap-2 text-sm font-700 transition-colors ${
                   isScrolled ? 'text-primary' : 'text-white'
                 }`}
@@ -101,7 +101,7 @@ export default function Header() {
             {/* Mobile Right */}
             <div className="flex lg:hidden items-center gap-2">
               <a
-                href="tel:+84901234567"
+                href={`tel:${siteConfig.contact.phone}`}
                 className={`p-2.5 rounded-xl transition-colors ${
                   isScrolled ? 'text-primary bg-primary/10' : 'text-white bg-white/20'
                 }`}
@@ -158,7 +158,7 @@ export default function Header() {
             </nav>
             <div className="p-4 border-t border-border space-y-3">
               <a
-                href="tel:+84901234567"
+                href={`tel:${siteConfig.contact.phone}`}
                 className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border-2 border-primary text-primary font-700"
               >
                 <Icon name="PhoneIcon" size={18} variant="solid" />

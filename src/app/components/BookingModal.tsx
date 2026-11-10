@@ -1,11 +1,34 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Icon from '@/components/ui/AppIcon';
+import { siteConfig } from '@/config/site';
 
 interface BookingModalProps {
   isOpen?: boolean;
   onClose?: () => void;
 }
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  'http://localhost:3002';
+
+const getVisitorId = () => {
+  if (typeof window === 'undefined') return undefined;
+
+  const STORAGE_KEY = 'viettaxi_visitor_id';
+  let visitorId = localStorage.getItem(STORAGE_KEY);
+
+  if (!visitorId) {
+    visitorId =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `guest-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    localStorage.setItem(STORAGE_KEY, visitorId);
+  }
+
+  return visitorId;
+};
 
 export default function BookingModal({ isOpen: externalIsOpen, onClose }: BookingModalProps) {
   const [internalOpen, setInternalOpen] = useState(false);
@@ -16,6 +39,7 @@ export default function BookingModal({ isOpen: externalIsOpen, onClose }: Bookin
   const [formData, setFormData] = useState({ pickup: '', destination: '', phone: '', notes: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -31,9 +55,43 @@ export default function BookingModal({ isOpen: externalIsOpen, onClose }: Bookin
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setIsSubmitting(false);
-    setSubmitted(true);
+    setSubmitError('');
+
+    try {
+      const payload = {
+        addressFrom: formData.pickup.trim(),
+        addressTo: formData.destination.trim(),
+        phoneNumber: formData.phone.trim(),
+        additionalInfo: formData.notes.trim(),
+        serviceType: selectedVehicle === '4-seat' ? 'Grap 4 Chỗ' : 'Grap 7 Chỗ',
+        visitorId: getVisitorId(),
+      };
+
+      const response = await fetch(`${API_BASE_URL}/api/booking/discord/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: siteConfig.url || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          result?.err || result?.message || 'Gửi đơn hàng thất bại. Vui lòng thử lại.'
+        );
+      }
+
+      setSubmitted(true);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Gửi đơn hàng thất bại. Vui lòng thử lại.';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -140,6 +198,13 @@ export default function BookingModal({ isOpen: externalIsOpen, onClose }: Bookin
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl border border-border bg-muted text-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 />
+
+                {submitError ? (
+                  <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {submitError}
+                  </p>
+                ) : null}
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -203,7 +268,7 @@ export default function BookingModal({ isOpen: externalIsOpen, onClose }: Bookin
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <a
-                  href="tel:+84901234567"
+                  href={`tel:${siteConfig.contact.phone}`}
                   className="flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white text-sm font-700"
                 >
                   <Icon name="PhoneIcon" size={14} variant="solid" />

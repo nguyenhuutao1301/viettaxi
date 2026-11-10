@@ -59,7 +59,7 @@ export default function Footer() {
             </p>
             <div className="space-y-2 text-sm text-white/60">
               <a
-                href="tel:+84901234567"
+                href={`tel:${siteConfig.contact.phone}`}
                 className="flex items-center gap-2 hover:text-white transition-colors"
               >
                 <Icon name="PhoneIcon" size={15} variant="solid" className="text-accent" />

@@ -243,7 +243,7 @@ export default function HeroSection() {
                       </div>
 
                       <a
-                        href="tel:+84901234567"
+                        href={`tel:${siteConfig.contact.phone}`}
                         className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border-2 border-primary text-primary font-700 text-sm hover:bg-primary/5 transition-colors"
                       >
                         <Icon name="PhoneIcon" size={16} variant="solid" />
@@ -291,7 +291,7 @@ export default function HeroSection() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <a
-                        href="tel:+84901234567"
+                        href={`tel:${siteConfig.contact.phone}`}
                         className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-white text-sm font-700"
                       >
                         <Icon name="PhoneIcon" size={14} variant="solid" />

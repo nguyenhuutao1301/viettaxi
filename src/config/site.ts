@@ -9,6 +9,6 @@ export const siteConfig = {
   name: 'VietTaxi',
   description: 'VietTaxi - Dịch vụ taxi hàng đầu Việt Nam',
   keywords: 'taxi, viettaxi, dịch vụ taxi, đặt xe, gọi xe, vận chuyển',
-  url: 'https://viettaxi.com',
+  url: 'https://viettaxi.pro.vn',
   ogImage: '/images/og-image.png',
 } as const;

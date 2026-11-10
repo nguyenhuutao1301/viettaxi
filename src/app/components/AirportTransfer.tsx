@@ -1,6 +1,7 @@
 import React from 'react';
 import AppImage from '@/components/ui/AppImage';
 import Icon from '@/components/ui/AppIcon';
+import { siteConfig } from '@/config/site';
 
 const features = [
   { icon: 'MapPinIcon', label: 'Đón tại cửa đến' },
@@ -76,7 +77,7 @@ export default function AirportTransfer() {
                 Đặt Taxi Sân Bay
               </a>
               <a
-                href="tel:+84901234567"
+                href={`tel:${siteConfig.contact.phone}`}
                 className="inline-flex items-center gap-2 border-2 border-primary text-primary px-7 py-3.5 rounded-xl font-700 hover:bg-primary/5 transition-colors"
               >
                 <Icon name="PhoneIcon" size={18} variant="solid" />
