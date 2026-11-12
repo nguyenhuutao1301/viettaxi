@@ -63,7 +63,7 @@ export default function Footer() {
                 className="flex items-center gap-2 hover:text-white transition-colors"
               >
                 <Icon name="PhoneIcon" size={15} variant="solid" className="text-accent" />
-                siteConfig.contact.phone
+                {siteConfig.contact.phone}
               </a>
               <a
                 href="mailto:support@viettaxi.vn"
@@ -114,7 +114,7 @@ export default function Footer() {
             </a>
             <span className="text-white/20">·</span>
             <a
-              href="https://zalo.me/0901234567"
+              href={'https://zalo.me/' + siteConfig.contact.phone}
               className="text-white/40 hover:text-white transition-colors text-sm"
             >
               Zalo
