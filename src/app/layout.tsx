@@ -34,6 +34,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="vi" className={plusJakartaSans.variable}>
       <body className={plusJakartaSans.className}>
+        <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WPSXWLXJ"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+            `,
+          }}
+        />
         {children}
 
         <script
